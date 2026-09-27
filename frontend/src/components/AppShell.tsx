@@ -20,6 +20,8 @@ import {
   X,
 } from "lucide-react";
 import { searchSyllabus } from "@/data/syllabus";
+import GlobalInteractionController from "@/components/GlobalInteractionController";
+import { Toaster } from "@/components/ui/sonner";
 
 interface AppShellProps {
   children: ReactNode;
@@ -29,7 +31,6 @@ const navItems = [
   { label: "Home", path: "/", icon: Home, testId: "nav-home-link" },
   { label: "VTU syllabus", path: "/subject/big-data-analytics", icon: BookOpen, testId: "nav-subjects-link" },
   { label: "3D learning lab", path: "/lab", icon: Box, testId: "nav-lab-link" },
-  { label: "Gesture mode", path: "/gesture", icon: Hand, testId: "nav-gesture-link" },
   { label: "Progress", path: "/progress", icon: Trophy, testId: "nav-progress-link" },
 ];
 
@@ -88,9 +89,9 @@ export default function AppShell({ children }: AppShellProps) {
 
         <div className="sidebar-bottom" data-testid="sidebar-bottom-card">
           <div className="mini-orbit" aria-hidden="true"><div /><div /><div /></div>
-          <p className="eyebrow" data-testid="sidebar-phase-label">PHASE 01 / FOUNDATION</p>
-          <p className="sidebar-card-title" data-testid="sidebar-card-title">Make every concept visible.</p>
-          <p className="sidebar-card-copy" data-testid="sidebar-card-copy">Your 3D lab, gestures and practice tools are being mapped to the syllabus.</p>
+          <p className="eyebrow" data-testid="sidebar-phase-label">PHASE 03 / CLASSROOM READY</p>
+          <p className="sidebar-card-title" data-testid="sidebar-card-title">Teach beyond the page.</p>
+          <p className="sidebar-card-copy" data-testid="sidebar-card-copy">3D models, quizzes, gesture control and voice now share one learning flow.</p>
         </div>
       </aside>
 
@@ -146,6 +147,8 @@ export default function AppShell({ children }: AppShellProps) {
         </header>
         <main className="page-content" data-testid="page-content">{children}</main>
       </div>
+      <GlobalInteractionController />
+      <Toaster richColors />
     </div>
   );
 }

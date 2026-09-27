@@ -29,6 +29,8 @@ export interface LearningSceneController {
   updateConfig: (config: LabConfig) => void;
   setPlaying: (playing: boolean) => void;
   setLayerVisible: (layer: "labels" | "connections" | "blocks", visible: boolean) => void;
+  gestureZoom: (delta: number) => void;
+  gestureRotate: (delta: number) => void;
   resetAnimation: () => void;
   resetCamera: () => void;
   dispose: () => void;

@@ -37,4 +37,15 @@ No authentication or roles in Phase 1. Progress is currently representative stat
 
 ## Intentionally deferred
 
-MediaPipe gestures, virtual cursor, Web Speech commands, quizzes, persistent local progress and AI explanation are planned for Phase 3. The Phase 2 `Explain this` control uses a predefined local response rather than an AI API.
+## Phase 3 additions
+
+- A global classroom interaction dock is available on every route; there is no separate gesture page. Camera activation is explicit and normal mouse/touch controls always remain available.
+- MediaPipe Tasks Vision runs HandLandmarker plus FaceDetector locally. The controller associates each detected wrist with the nearest detected face, preserves handedness as a lock hint, displays confidence, and releases the lock after the hand disappears.
+- Strict multi-frame gesture state machine: index pointing controls a virtual cursor, deliberate double finger-tap clicks, thumb-index distance zooms, two raised fingers rotate the 3D camera, and open-palm horizontal/vertical slides navigate topics or scroll.
+- Optional Web Speech commands support next/previous, start/pause animation, reset model, open gesture controls, explain NameNode, show DataNodes, open lab and open progress. Unsupported voice/camera states provide mouse fallbacks.
+- Every mapped module topic now has a concise definition, real-world example, key points and takeaway. One three-question explained quiz is available for each of the five VTU modules.
+- Progress persists in localStorage: topics read, models and objects explored, module quiz scores, revision topics, gestures and voice commands. `/progress` visualizes the totals and offers a confirmation-gated reset.
+
+## Mocked/local features
+
+The 3D lab's `Explain this` response is predefined local text rather than a live AI API. No camera frame or landmark leaves the browser. The first MediaPipe activation downloads pinned WASM/model assets from official hosts; normal controls remain available if loading fails.

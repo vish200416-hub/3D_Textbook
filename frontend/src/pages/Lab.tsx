@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Box, Calculator, CheckCircle2, CircleHelp, Eye, EyeOff, Gauge, Info, Layers3, Pause, Play, RotateCcw, SlidersHorizontal, Sparkles, Target, Zap } from "lucide-react";
 import ThreeLearningLab from "@/components/ThreeLearningLab";
 import { getLabMetrics, DEFAULT_LAB_CONFIG, type LabConfig, type LabMode, type SelectedObjectInfo } from "@/lib/three/types";
+import { trackProgress } from "@/lib/progress";
 
 const modeOptions: Array<{ id: LabMode; label: string; short: string; accent: string }> = [
   { id: "hdfs", label: "HDFS architecture", short: "Distributed storage", accent: "cyan" },
@@ -39,14 +40,35 @@ export default function Lab() {
   const handleSelect = useCallback((info: SelectedObjectInfo | null) => {
     setSelected(info);
     setShowExplanation(false);
+    if (info) trackProgress("object", info.id);
   }, []);
 
   const toggleLayer = (layer: keyof typeof layerVisibility) => setLayerVisibility((current) => ({ ...current, [layer]: !current[layer] }));
 
-  return <div className="lab-page" data-testid="lab-page">
-    <div className="lab-header" data-testid="lab-header"><div><Link to="/subject/big-data-analytics/module/module-2" className="back-link" data-testid="lab-back-link"><ArrowLeft size={15} /> Back to Hadoop module</Link><div className="lab-title-line"><span className="live-badge" data-testid="lab-live-badge"><span /> PHASE 2 / LIVE LAB</span><h1 data-testid="lab-page-title">3D Learning Lab</h1></div><p data-testid="lab-page-description">Explore how data moves, splits and scales across the VTU Big Data Analytics syllabus.</p></div><div className="lab-header-tools" data-testid="lab-header-tools"><span className="lab-status"><span className="status-dot" /> Mouse controls active</span><Link to="/gesture" className="secondary-button" data-testid="lab-gesture-preview-link"><Target size={15} /> Preview gestures <ArrowRight size={14} /></Link></div></div>
+  const changeMode = (mode: LabMode) => {
+    updateConfig("mode", mode);
+    setSelected(null);
+    trackProgress("mode", mode);
+  };
 
-    <div className="lab-mode-strip" data-testid="lab-mode-strip"><div className="mode-strip-label"><span className="eyebrow" data-testid="lab-mode-eyebrow">VISUAL TOPIC MODES</span><span data-testid="lab-mode-caption">Every module gets a visual language.</span></div><div className="mode-options">{modeOptions.map((option) => <button key={option.id} className={`mode-option accent-${option.accent} ${config.mode === option.id ? "is-active" : ""}`} onClick={() => { updateConfig("mode", option.id); setSelected(null); }} data-testid={`lab-mode-${option.id}`}><span className="mode-option-icon">{option.id === "hdfs" ? <Layers3 size={15} /> : option.id === "foundations" ? <Sparkles size={15} /> : option.id === "mongodb" ? <Box size={15} /> : option.id === "hive-pig" ? <SlidersHorizontal size={15} /> : <Zap size={15} />}</span><span><strong data-testid={`lab-mode-label-${option.id}`}>{option.label}</strong><small data-testid={`lab-mode-short-${option.id}`}>{option.short}</small></span></button>)}</div></div>
+  useEffect(() => {
+    trackProgress("mode", config.mode);
+    const onVoice = (event: Event) => {
+      const command = (event as CustomEvent<string>).detail;
+      if (command === "start-animation") setPlaying(true);
+      if (command === "pause-animation") setPlaying(false);
+      if (command === "reset-model") { setResetSignal((value) => value + 1); setAnimationResetSignal((value) => value + 1); }
+      if (command === "show-datanodes") { setConfig((current) => ({ ...current, mode: "hdfs" })); setLayerVisibility((current) => ({ ...current, blocks: true, connections: true })); }
+      if (command === "explain-namenode") setSelected({ id: "namenode", name: "NameNode", type: "Metadata manager", description: "The NameNode manages metadata and the namespace of the distributed file system.", properties: ["Tracks file names", "Maps blocks to DataNodes", "Coordinates replication"] });
+    };
+    window.addEventListener("voice-command", onVoice);
+    return () => window.removeEventListener("voice-command", onVoice);
+  }, [config.mode]);
+
+  return <div className="lab-page" data-testid="lab-page">
+    <div className="lab-header" data-testid="lab-header"><div><Link to="/subject/big-data-analytics/module/module-2" className="back-link" data-testid="lab-back-link"><ArrowLeft size={15} /> Back to Hadoop module</Link><div className="lab-title-line"><span className="live-badge" data-testid="lab-live-badge"><span /> PHASE 3 / CLASSROOM READY</span><h1 data-testid="lab-page-title">3D Learning Lab</h1></div><p data-testid="lab-page-description">Explore how data moves, splits and scales across the VTU Big Data Analytics syllabus.</p></div><div className="lab-header-tools" data-testid="lab-header-tools"><span className="lab-status"><span className="status-dot" /> Mouse + gesture controls</span><button className="secondary-button" onClick={() => (document.querySelector('[data-testid="global-gesture-toggle-button"]') as HTMLButtonElement | null)?.click()} data-testid="lab-gesture-preview-link"><Target size={15} /> Enable gestures <ArrowRight size={14} /></button></div></div>
+
+    <div className="lab-mode-strip" data-testid="lab-mode-strip"><div className="mode-strip-label"><span className="eyebrow" data-testid="lab-mode-eyebrow">VISUAL TOPIC MODES</span><span data-testid="lab-mode-caption">Every module gets a visual language.</span></div><div className="mode-options">{modeOptions.map((option) => <button key={option.id} className={`mode-option accent-${option.accent} ${config.mode === option.id ? "is-active" : ""}`} onClick={() => changeMode(option.id)} data-testid={`lab-mode-${option.id}`}><span className="mode-option-icon">{option.id === "hdfs" ? <Layers3 size={15} /> : option.id === "foundations" ? <Sparkles size={15} /> : option.id === "mongodb" ? <Box size={15} /> : option.id === "hive-pig" ? <SlidersHorizontal size={15} /> : <Zap size={15} />}</span><span><strong data-testid={`lab-mode-label-${option.id}`}>{option.label}</strong><small data-testid={`lab-mode-short-${option.id}`}>{option.short}</small></span></button>)}</div></div>
 
     <div className="lab-layout" data-testid="lab-layout"><section className="lab-stage-card glass-panel" data-testid="lab-stage-card"><div className="lab-stage-toolbar" data-testid="lab-stage-toolbar"><div><span className="module-code" data-testid="lab-current-mode-code">{currentMode.short}</span><h2 data-testid="lab-current-mode-title">{modeTitles[config.mode]}</h2></div><div className="stage-actions"><button className={`stage-control ${playing ? "is-active" : ""}`} onClick={() => setPlaying((value) => !value)} data-testid="lab-animation-toggle-button">{playing ? <Pause size={15} /> : <Play size={15} />}{playing ? "Pause flow" : "Play flow"}</button><button className="stage-control" onClick={() => setResetSignal((value) => value + 1)} data-testid="lab-reset-camera-button"><RotateCcw size={15} /> Reset camera</button></div></div><div className="canvas-frame" data-testid="canvas-frame"><ThreeLearningLab config={config} playing={playing} resetSignal={resetSignal} animationResetSignal={animationResetSignal} layerVisibility={layerVisibility} onSelect={handleSelect} /><div className="canvas-overlay-top" data-testid="canvas-overlay-status"><span><span className="status-dot" /> LIVE SCENE</span><span><Eye size={13} /> Drag to orbit · Scroll to zoom</span></div><div className="canvas-overlay-bottom" data-testid="canvas-overlay-bottom"><span>{config.mode === "hdfs" ? `${config.dataNodes} DataNodes · ${config.blocks} blocks · ${config.replicas}× replication` : `${config.dataNodes + config.blocks} visual objects · ${config.flowSpeed.toFixed(1)}× flow`}</span><span className="canvas-hint"><Info size={13} /> Click an object to inspect</span></div></div><div className="lab-stage-footer" data-testid="lab-stage-footer"><span><CheckCircle2 size={15} /> Procedural fallback active — no model download required</span><span><Box size={15} /> GLTFLoader ready for future approved assets</span></div></section>
 

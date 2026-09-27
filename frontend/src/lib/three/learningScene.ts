@@ -325,6 +325,21 @@ export function createLearningScene(
         if (object.userData.layer === layer) object.visible = visible;
       });
     },
+    gestureZoom: (delta) => {
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      const distance = camera.position.distanceTo(controls.target);
+      // Increasing thumb-index distance (pinch out) moves the camera closer;
+      // decreasing distance (pinch in) moves it farther away, matching the classroom gesture guide.
+      const nextDistance = THREE.MathUtils.clamp(distance - delta * 1.8, controls.minDistance, controls.maxDistance);
+      camera.position.copy(controls.target).add(direction.multiplyScalar(nextDistance));
+      controls.update();
+    },
+    gestureRotate: (delta) => {
+      const offset = camera.position.clone().sub(controls.target);
+      offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), delta * 2.2);
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    },
     resetAnimation: () => {
       animationTime = 0;
       packets.forEach((packet) => packet.mesh.position.copy(packet.path[0]));

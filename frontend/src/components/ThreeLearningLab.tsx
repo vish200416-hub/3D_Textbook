@@ -55,5 +55,16 @@ export default function ThreeLearningLab({ config, playing, resetSignal, animati
     sceneRef.current?.setLayerVisible("blocks", layerVisibility.blocks);
   }, [layerVisibility]);
 
+  useEffect(() => {
+    const onZoom = (event: Event) => sceneRef.current?.gestureZoom((event as CustomEvent<number>).detail);
+    const onRotate = (event: Event) => sceneRef.current?.gestureRotate((event as CustomEvent<number>).detail);
+    window.addEventListener("lesson-zoom", onZoom);
+    window.addEventListener("lesson-rotate", onRotate);
+    return () => {
+      window.removeEventListener("lesson-zoom", onZoom);
+      window.removeEventListener("lesson-rotate", onRotate);
+    };
+  }, []);
+
   return <div ref={hostRef} className="three-canvas-host" aria-label="Interactive Three.js learning model" data-testid="three-canvas-host" />;
 }
