@@ -86,6 +86,7 @@ export default function AppShell({ children }: AppShellProps) {
             <Settings size={18} strokeWidth={1.8} /><span data-testid="nav-settings-link-label">Settings</span>
           </Link>
         </nav>
+        <div id="sidebar-interaction-slot" className="sidebar-interaction-slot" data-testid="sidebar-interaction-slot" />
 
       </aside>
 

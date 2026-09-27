@@ -65,7 +65,7 @@ Open `http://localhost:3000`. Camera access needs HTTPS or localhost. The first 
 - Dynamic DataNode, block, replication, flow-speed and dataset-size parameters.
 - Numerical Lens that recalculates educational values as parameters change.
 - Whole-site MediaPipe hand control with nearest-face hand association and visible confidence.
-- Virtual pointer, deliberate double-tap click, pinch-distance zoom, two-finger rotation and palm-slide navigation/scroll.
+- Virtual pointer with one-second hold selection, pinch-distance zoom, two-finger rotation and palm-armed fist-drag scrolling.
 - Whole-site optional Web Speech commands with unsupported-browser fallback.
 - Deterministic whole-site voice routing opens named simulations, controls zoom/playback and selects named 3D components without an AI service.
 - One explained multiple-choice quiz per VTU module, scores and revision topics.
@@ -113,10 +113,10 @@ MediaPipe returns normalized face boxes and 21 landmarks for each visible hand. 
 Finger extension is estimated by comparing fingertip-to-wrist distance with the corresponding middle-joint-to-wrist distance. A state machine requires several consecutive frames before acting:
 
 - Index only: virtual pointer.
-- Two deliberate tap-pose transitions within 520 ms: click.
+- A stable pointing finger held over the same target for one second: click.
 - Change in thumb-to-index distance: zoom.
 - Stable index and middle fingers plus angle change: rotate.
-- Stable open palm plus horizontal/vertical displacement: topic navigation or page scroll.
+- Stable open palm arms page movement; closing into a fist grabs the page, fist movement scrolls it, and reopening releases it.
 
 Cooldowns reduce repeated clicks and swipes. Mouse, touch and keyboard behavior is never disabled.
 

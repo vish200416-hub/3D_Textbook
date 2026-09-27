@@ -1,7 +1,7 @@
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 export interface Point2D { x: number; y: number }
-export type GestureName = "point" | "double-tap" | "pinch-zoom" | "two-finger-rotate" | "palm-slide" | "tracking";
+export type GestureName = "point" | "point-hold" | "pinch-zoom" | "two-finger-rotate" | "scroll-armed" | "fist-drag" | "fist-release" | "tracking";
 
 export interface GestureFrame {
   pointer: Point2D;
@@ -11,7 +11,7 @@ export interface GestureFrame {
   twoFingerAngle: number;
   palmOpen: boolean;
   palmCenter: Point2D;
-  tapPose: boolean;
+  fistActive: boolean;
 }
 
 export interface HandCandidate {
@@ -63,7 +63,7 @@ export function interpretHand(landmarks: NormalizedLandmark[]): GestureFrame {
   const palmOpen = [indexExtended, middleExtended, ringExtended, pinkyExtended].filter(Boolean).length >= 4;
   const pointActive = indexExtended && !middleExtended && !ringExtended && !pinkyExtended;
   const twoFingerActive = indexExtended && middleExtended && !ringExtended && !pinkyExtended;
-  const tapPose = pointActive && distance(indexTip, indexPip) < 0.065;
+  const fistActive = !indexExtended && !middleExtended && !ringExtended && !pinkyExtended;
   return {
     pointer: { x: 1 - indexTip.x, y: indexTip.y },
     pointActive,
@@ -72,35 +72,70 @@ export function interpretHand(landmarks: NormalizedLandmark[]): GestureFrame {
     twoFingerAngle: Math.atan2(middleTip.y - indexTip.y, middleTip.x - indexTip.x),
     palmOpen,
     palmCenter: { x: 1 - landmarks[9].x, y: landmarks[9].y },
-    tapPose,
+    fistActive,
   };
 }
 
 export class GestureStateMachine {
   private stablePointFrames = 0;
   private stablePalmFrames = 0;
+  private stableFistFrames = 0;
   private stableTwoFingerFrames = 0;
   private lastFrame: GestureFrame | null = null;
-  private lastTapAt = 0;
+  private pointHoldStartedAt = 0;
+  private pointHoldOrigin: Point2D | null = null;
+  private pointHoldFired = false;
   private lastClickAt = 0;
-  private tapWasActive = false;
-  private lastSwipeAt = 0;
+  private scrollArmed = false;
+  private fistDragging = false;
+  private lastDragPoint: Point2D | null = null;
 
   process(frame: GestureFrame, timestamp: number) {
     const events: Array<{ name: GestureName; detail?: number | Point2D | { x: number; y: number } }> = [];
     this.stablePointFrames = frame.pointActive ? this.stablePointFrames + 1 : 0;
     this.stablePalmFrames = frame.palmOpen ? this.stablePalmFrames + 1 : 0;
+    this.stableFistFrames = frame.fistActive ? this.stableFistFrames + 1 : 0;
     this.stableTwoFingerFrames = frame.twoFingerActive ? this.stableTwoFingerFrames + 1 : 0;
 
-    if (this.stablePointFrames >= 3) events.push({ name: "point", detail: frame.pointer });
-    if (frame.tapPose && !this.tapWasActive && this.stablePointFrames >= 3) {
-      if (timestamp - this.lastTapAt < 520 && timestamp - this.lastClickAt > 900) {
-        events.push({ name: "double-tap", detail: frame.pointer });
+    if (this.stablePointFrames >= 3) {
+      events.push({ name: "point", detail: frame.pointer });
+      if (!this.pointHoldOrigin || distance(frame.pointer, this.pointHoldOrigin) > 0.035) {
+        this.pointHoldOrigin = frame.pointer;
+        this.pointHoldStartedAt = timestamp;
+        this.pointHoldFired = false;
+      } else if (!this.pointHoldFired && timestamp - this.pointHoldStartedAt >= 1000 && timestamp - this.lastClickAt > 1200) {
+        events.push({ name: "point-hold", detail: frame.pointer });
+        this.pointHoldFired = true;
         this.lastClickAt = timestamp;
       }
-      this.lastTapAt = timestamp;
+    } else {
+      this.pointHoldOrigin = null;
+      this.pointHoldStartedAt = 0;
+      this.pointHoldFired = false;
     }
-    this.tapWasActive = frame.tapPose;
+
+    if (this.stablePalmFrames === 5 && !this.fistDragging) {
+      this.scrollArmed = true;
+      events.push({ name: "scroll-armed" });
+    }
+
+    if (this.scrollArmed && this.stableFistFrames >= 3 && !this.fistDragging) {
+      this.fistDragging = true;
+      this.lastDragPoint = frame.palmCenter;
+    }
+
+    if (this.fistDragging && frame.fistActive && this.lastDragPoint) {
+      const delta = { x: frame.palmCenter.x - this.lastDragPoint.x, y: frame.palmCenter.y - this.lastDragPoint.y };
+      if (Math.max(Math.abs(delta.x), Math.abs(delta.y)) > 0.002) events.push({ name: "fist-drag", detail: delta });
+      this.lastDragPoint = frame.palmCenter;
+    }
+
+    if (this.fistDragging && this.stablePalmFrames >= 3) {
+      this.fistDragging = false;
+      this.scrollArmed = false;
+      this.lastDragPoint = null;
+      events.push({ name: "fist-release" });
+    }
 
     if (this.lastFrame) {
       const pinchDelta = frame.pinchDistance - this.lastFrame.pinchDistance;
@@ -113,14 +148,6 @@ export class GestureStateMachine {
         if (angleDelta < -Math.PI) angleDelta += Math.PI * 2;
         if (Math.abs(angleDelta) > 0.015) events.push({ name: "two-finger-rotate", detail: angleDelta });
       }
-      if (this.stablePalmFrames >= 5 && this.lastFrame.palmOpen && timestamp - this.lastSwipeAt > 800) {
-        const deltaX = frame.palmCenter.x - this.lastFrame.palmCenter.x;
-        const deltaY = frame.palmCenter.y - this.lastFrame.palmCenter.y;
-        if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) > 0.035) {
-          events.push({ name: "palm-slide", detail: { x: deltaX, y: deltaY } });
-          this.lastSwipeAt = timestamp;
-        }
-      }
     }
     this.lastFrame = frame;
     return events;
@@ -129,9 +156,14 @@ export class GestureStateMachine {
   reset() {
     this.stablePointFrames = 0;
     this.stablePalmFrames = 0;
+    this.stableFistFrames = 0;
     this.stableTwoFingerFrames = 0;
     this.lastFrame = null;
-    this.lastTapAt = 0;
-    this.tapWasActive = false;
+    this.pointHoldStartedAt = 0;
+    this.pointHoldOrigin = null;
+    this.pointHoldFired = false;
+    this.scrollArmed = false;
+    this.fistDragging = false;
+    this.lastDragPoint = null;
   }
 }

@@ -6,6 +6,7 @@ import { createVisionTasks } from "@/lib/gesture/vision";
 import { chooseClosestHand, GestureStateMachine, interpretHand, type FaceCenter, type HandCandidate, type Point2D } from "@/lib/gesture/recognition";
 import { trackProgress } from "@/lib/progress";
 import { createSpeechRecognition, type VoiceCommand } from "@/lib/voice";
+import { createPortal } from "react-dom";
 
 type ControllerStatus = "off" | "loading" | "ready" | "searching" | "error";
 
@@ -32,6 +33,7 @@ export default function GlobalInteractionController() {
   const [pointer, setPointer] = useState<Point2D | null>(null);
   const [listening, setListening] = useState(false);
   const [voiceMessage, setVoiceMessage] = useState("Voice ready");
+  const [panelTarget, setPanelTarget] = useState<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const tasksRef = useRef<TasksRef | null>(null);
@@ -80,13 +82,12 @@ export default function GlobalInteractionController() {
       setGestureName(event.name);
       trackProgress("gesture");
       if (event.name === "point") setPointer(event.detail as Point2D);
-      if (event.name === "double-tap") actAtPointer(event.detail as Point2D);
+      if (event.name === "point-hold") actAtPointer(event.detail as Point2D);
       if (event.name === "pinch-zoom") emitInteraction("lesson-zoom", event.detail);
       if (event.name === "two-finger-rotate") emitInteraction("lesson-rotate", event.detail);
-      if (event.name === "palm-slide") {
+      if (event.name === "fist-drag") {
         const delta = event.detail as Point2D;
-        if (Math.abs(delta.y) > Math.abs(delta.x)) window.scrollBy({ top: delta.y * 900, behavior: "smooth" });
-        else emitInteraction("lesson-swipe", delta.x > 0 ? "next" : "previous");
+        window.scrollBy({ left: -delta.x * 1400, top: -delta.y * 1800, behavior: "auto" });
       }
     });
   }, [actAtPointer]);
@@ -223,6 +224,12 @@ export default function GlobalInteractionController() {
     stopGestureControl();
   }, [stopGestureControl]);
 
+  useEffect(() => {
+    setPanelTarget(document.getElementById("sidebar-interaction-slot"));
+  }, []);
+
+  const interactionPanel = panelOpen && <div className="interaction-panel" data-testid="interaction-panel"><div className="interaction-panel-head"><div><span className="eyebrow">CLASSROOM CONTROL</span><h3 data-testid="interaction-panel-title">Teacher interaction lock</h3></div><button onClick={() => setPanelOpen(false)} aria-label="Close interaction panel" data-testid="interaction-panel-close-button"><X size={16} /></button></div><div className="camera-preview-wrap" data-testid="camera-preview-wrap"><video ref={videoRef} muted playsInline data-testid="gesture-camera-preview" /><div className={`camera-state state-${status}`}><span>{status === "loading" ? <RefreshCw size={15} className="spin-icon" /> : status === "ready" ? <Lock size={15} /> : status === "error" ? <CameraOff size={15} /> : <ScanFace size={15} />}</span><strong data-testid="gesture-status-message">{statusMessage}</strong></div>{status === "ready" && <div className="hand-lock-badge" data-testid="hand-lock-badge"><Lock size={12} /> {lockedHand ?? "Hand"} · {Math.round(confidence * 100)}%</div>}</div><div className="gesture-readout" data-testid="gesture-readout"><div><MousePointer2 size={15} /><span>Detected</span><strong data-testid="detected-gesture-name">{gestureName}</strong></div><div><ScanFace size={15} /><span>Lock</span><strong data-testid="detected-hand-lock">{lockedHand ?? "Searching"}</strong></div></div><p className="gesture-guide" data-testid="gesture-guide">Point and hold for 1 second = click · pinch distance = zoom · two fingers = rotate · open palm, make a fist and drag = move the page · reopen palm = release.</p><div className="voice-readout" data-testid="voice-readout"><Mic size={14} /><span data-testid="voice-status-message">{voiceMessage}</span></div><p className="voice-guide" data-testid="voice-command-guide">Say: “open MongoDB animation”, “zoom in”, “pause animation”, “select DataNode”, “explain NameNode”, “open progress”, “next topic”.</p><p className="privacy-note" data-testid="gesture-privacy-note">Video is processed on this device and is never uploaded. Good lighting and a raised hand improve long-distance classroom tracking.</p></div>;
+
   return <>
     {pointer && status === "ready" && <div className="virtual-cursor" style={{ left: `${pointer.x * 100}%`, top: `${pointer.y * 100}%` }} data-testid="virtual-cursor"><span /></div>}
     <div className={`interaction-dock ${panelOpen ? "is-open" : ""}`} data-testid="interaction-dock">
@@ -231,7 +238,7 @@ export default function GlobalInteractionController() {
         <button className={listening ? "is-active" : ""} onClick={listening ? () => recognitionRef.current?.stop() : startVoice} data-testid="global-voice-toggle-button">{listening ? <MicOff size={17} /> : <Mic size={17} />}<span>{listening ? "Listening" : "Voice"}</span></button>
         <button className="dock-expand" onClick={() => setPanelOpen((value) => !value)} aria-label="Toggle interaction panel" data-testid="interaction-panel-toggle-button"><ChevronDown size={17} /></button>
       </div>
-      {panelOpen && <div className="interaction-panel" data-testid="interaction-panel"><div className="interaction-panel-head"><div><span className="eyebrow">CLASSROOM CONTROL</span><h3 data-testid="interaction-panel-title">Teacher interaction lock</h3></div><button onClick={() => setPanelOpen(false)} aria-label="Close interaction panel" data-testid="interaction-panel-close-button"><X size={16} /></button></div><div className="camera-preview-wrap" data-testid="camera-preview-wrap"><video ref={videoRef} muted playsInline data-testid="gesture-camera-preview" /><div className={`camera-state state-${status}`}><span>{status === "loading" ? <RefreshCw size={15} className="spin-icon" /> : status === "ready" ? <Lock size={15} /> : status === "error" ? <CameraOff size={15} /> : <ScanFace size={15} />}</span><strong data-testid="gesture-status-message">{statusMessage}</strong></div>{status === "ready" && <div className="hand-lock-badge" data-testid="hand-lock-badge"><Lock size={12} /> {lockedHand ?? "Hand"} · {Math.round(confidence * 100)}%</div>}</div><div className="gesture-readout" data-testid="gesture-readout"><div><MousePointer2 size={15} /><span>Detected</span><strong data-testid="detected-gesture-name">{gestureName}</strong></div><div><ScanFace size={15} /><span>Lock</span><strong data-testid="detected-hand-lock">{lockedHand ?? "Searching"}</strong></div></div><p className="gesture-guide" data-testid="gesture-guide">Point = cursor · double finger tap = click · pinch distance = zoom · two fingers = rotate · open palm slide = move page. Mouse and touch always remain available.</p><div className="voice-readout" data-testid="voice-readout"><Mic size={14} /><span data-testid="voice-status-message">{voiceMessage}</span></div><p className="voice-guide" data-testid="voice-command-guide">Say: “open MongoDB animation”, “zoom in”, “pause animation”, “select DataNode”, “explain NameNode”, “open progress”, “next topic”.</p><p className="privacy-note" data-testid="gesture-privacy-note">Video is processed on this device and is never uploaded. Good lighting and a raised hand improve long-distance classroom tracking.</p></div>}
     </div>
+    {panelTarget && interactionPanel ? createPortal(interactionPanel, panelTarget) : null}
   </>;
 }

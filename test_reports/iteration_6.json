@@ -1,0 +1,54 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "No API-bearing acceptance criteria this iteration; all six matrix items are entirely client-side (mocked MediaPipe hand landmarks driving the point-hold/scroll-arm/fist-grab gesture state machine, plus sidebar/dock layout). Backend tests/ contains only conftest.py (0 collected) - no backend lane applicable.",
+    "Removed the obsolete gesture-double-tap-canvas-safe and gesture-double-tap-activates-ui-control browser checks: the briefing states the double-tap gesture was intentionally removed and replaced by point-hold, so those checks no longer describe current, intended behavior. Their coverage is superseded by point-hold-canvas-safe and point-hold-activates-ui-control."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Point hold replaces unreliable double tap",
+      "name": "point-hold-activates-ui-control",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Mocked MediaPipe HandLandmarker held a steady index-point at nav-settings-link. detected-gesture-name transitioned through point-hold (captured via MutationObserver since the state reverts to 'point' on the very next ~66ms frame) and the app navigated to /settings from a single hold - no double-tap/alternating-tap sequence was scripted. Zero synthetic pointerdown events recorded."
+    },
+    {
+      "criterion": "Point hold safely selects the 3D canvas",
+      "name": "point-hold-canvas-safe",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "With HTMLCanvasElement.prototype.setPointerCapture forced to throw NotFoundError, mocked point-hold over the /lab three-canvas-host canvas reached detected-gesture-name='point-hold' with zero synthetic pointerdown events and no pageerror; separately, dispatching lesson-select-at populated selected-object-name, confirming the raycast selection path remains intact."
+    },
+    {
+      "criterion": "Open palm arms fist-grab scrolling",
+      "name": "scroll-open-palm-arms-fist-grab",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /progress: stable open-palm frames produced detected-gesture-name='scroll-armed' with window.scrollY unchanged (delta<=2px). Transitioning to a stable fist then fist movement produced continuous window.scrollY changes (expect.poll detected a change within 6s). Reopening the palm produced detected-gesture-name='fist-release' and scrollY stayed stable (delta<=2px) for 700ms after release."
+    },
+    {
+      "criterion": "Fist cannot accidentally scroll before arming",
+      "name": "fist-scroll-blocked-without-arming",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /progress, driving the mocked hand straight to 'fist' then 'fist-move' (no preceding open-palm frames) left window.scrollY unchanged (delta<=2px) over 2s and detected-gesture-name never showed 'fist-drag'; no fist-drag window event fired (window.__fistDragCount stayed unused/0 path never hit)."
+    },
+    {
+      "criterion": "Camera preview appears below Settings and not over 3D content",
+      "name": "camera-preview-below-settings",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /lab at desktop viewport, expanding interaction-panel-toggle-button rendered interaction-panel inside sidebar-interaction-slot (x aligned within 40px, y >= slot.y), below nav-settings-link (panel.y >= settings.y), within the sidebar's horizontal bounds, and with zero rectangle overlap against three-canvas-host."
+    },
+    {
+      "criterion": "Compact dock is at extreme bottom-left and controller persists",
+      "name": "compact-dock-position-and-persistence",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "interaction-dock boundingBox showed x<=12px and bottom gap<=12px on Home and again on /lab. After starting an active mocked tracking session (global-gesture-toggle-button reached is-active) and navigating Home -> subject -> module -> Progress -> 3D Lab, interaction-dock stayed at count 1 and global-gesture-toggle-button retained the is-active class at every stop, confirming one global controller persists and the session is not stopped by route changes."
+    }
+  ]
+}
