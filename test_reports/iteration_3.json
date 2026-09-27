@@ -1,0 +1,17 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "No API-bearing acceptance criteria this iteration; Phase 3 gesture/voice/module changes are entirely client-side (MediaPipe Tasks Vision runs in-browser, no camera frames leave the device, no auth), so no backend test files were added. Backend suite has zero test files and ran cleanly."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {"criterion":"Gesture mode no longer crashes in FaceDetector","name":"gesture-mode-mocked-no-crash","lane":"browser","status":"passed","evidence":"With a mocked playable canvas.captureStream() camera and MediaPipe module doubles (route-mocked @mediapipe_tasks-vision.js chunk) returning empty detections, gesture toggle reached an active state with no page errors and no 'could not start' error message; verified FaceDetector.createFromOptions was called with baseOptions.modelAssetPath containing '.../blaze_face_short_range/float16/1/blaze_face_short_range.tflite' (matches vision.ts source, confirmed by direct file read)."},
+    {"criterion":"Face detection failure falls back safely","name":"face-detect-failure-falls-back-to-hands","lane":"browser","status":"passed","evidence":"Mocked FaceDetector.detectForVideo throwing the exact 'raw_box_tensor shape [1,2304,16] vs [1,896,16]' INTERNAL CalculatorGraph error while HandLandmarker returned a synthetic 1-hand landmark set; gesture-status-message settled on 'Hand tracking active · face matching unavailable', window.__faceClosed=true, window.__handClosed stayed false (hand tracking kept running), and no uncaught page errors were recorded."},
+    {"criterion":"Camera denial and unavailable camera remain non-blocking","name":"gesture-camera-fallback-denied","lane":"browser","status":"passed","evidence":"getUserMedia stubbed to reject with DOMException NotAllowedError; gesture-status-message showed 'Camera permission was denied. Mouse controls are still available.'; sidebar mouse navigation to /lab afterward still rendered three-canvas-host, proving the 3D lab and mouse controls remain usable."},
+    {"criterion":"Module navigation removes Explore","name":"module-tabs-no-explore","lane":"browser","status":"passed","evidence":"Module 02 (module-2, HDFS/Hadoop) learning-tabs strip rendered exactly Learn/Practice/Code lab/Quiz; learning-tab-explore had 0 matches and tab strip text had no 'explore' substring."},
+    {"criterion":"Learn provides proper student-facing textbook explanations","name":"learn-panel-textbook-content","lane":"browser","status":"passed","evidence":"HDFS topic (module-2) and a Module 03 topic each rendered >=2 textbook-paragraph entries plus definition-copy (example), concept-note-copy (key idea), key-takeaways list and topic-takeaway; no developer-facing/placeholder copy detected in panel text."},
+    {"criterion":"Practice contains worked numericals","name":"practice-panel-worked-numericals","lane":"browser","status":"passed","evidence":"Module 02 Practice tab listed a numerical whose summary/problem text matched /block/ and /replicat/ (HDFS block+replication calculation); the first (default-open) item showed GIVEN values, numbered SOLUTION steps and a numerical-answer element with the final answer plus a concept explanation line."}
+  ]
+}

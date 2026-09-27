@@ -40,10 +40,10 @@ No authentication or roles in Phase 1. Progress is currently representative stat
 ## Phase 3 additions
 
 - A global classroom interaction dock is available on every route; there is no separate gesture page. Camera activation is explicit and normal mouse/touch controls always remain available.
-- MediaPipe Tasks Vision runs HandLandmarker plus FaceDetector locally. The controller associates each detected wrist with the nearest detected face, preserves handedness as a lock hint, displays confidence, and releases the lock after the hand disappears.
+- MediaPipe Tasks Vision runs HandLandmarker plus the Tasks-compatible 896-box BlazeFace detector locally. The controller associates each detected wrist with the nearest detected face, preserves handedness as a lock hint, displays confidence, and releases the lock after the hand disappears. Any face graph failure is isolated and automatically falls back to highest-confidence hand tracking instead of crashing the application.
 - Strict multi-frame gesture state machine: index pointing controls a virtual cursor, deliberate double finger-tap clicks, thumb-index distance zooms, two raised fingers rotate the 3D camera, and open-palm horizontal/vertical slides navigate topics or scroll.
 - Optional Web Speech commands support next/previous, start/pause animation, reset model, open gesture controls, explain NameNode, show DataNodes, open lab and open progress. Unsupported voice/camera states provide mouse fallbacks.
-- Every mapped module topic now has a concise definition, real-world example, key points and takeaway. One three-question explained quiz is available for each of the five VTU modules.
+- Every mapped module topic now has textbook explanation paragraphs, a concrete example, key points and a takeaway. The module view exposes Learn, Practice, Code and Quiz only; the 3D Lab remains a dedicated sidebar page. Practice contains worked numericals with given values, calculations, final answers and concept explanations. One three-question explained quiz is available for each module.
 - Progress persists in localStorage: topics read, models and objects explored, module quiz scores, revision topics, gestures and voice commands. `/progress` visualizes the totals and offers a confirmation-gated reset.
 
 ## Mocked/local features

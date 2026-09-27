@@ -77,7 +77,7 @@ Open `http://localhost:3000`. Camera access needs HTTPS or localhost. The first 
 - React 19, TypeScript and Vite
 - Tailwind CSS v4 and shadcn/ui
 - Three.js, OrbitControls, Raycaster and GLTFLoader
-- MediaPipe Tasks Vision: HandLandmarker and FaceDetector
+- MediaPipe Tasks Vision: HandLandmarker and Tasks-compatible BlazeFace FaceDetector
 - Web Speech API / SpeechRecognition
 - Browser localStorage
 - FastAPI template API and MongoDB connectivity probe
@@ -105,7 +105,7 @@ The scene rebuilds procedural blocks after a slider change, and the Numerical Le
 
 ### Face-to-hand locking
 
-MediaPipe returns normalized face boxes and 21 landmarks for each visible hand. The app uses the full-range sparse BlazeFace model, then calculates the two-dimensional distance from each hand wrist to each face center. The minimum distance wins. The previous handedness receives a small preference so the lock does not rapidly jump between hands. If the locked hand disappears for about 700 milliseconds, the lock is released.
+MediaPipe returns normalized face boxes and 21 landmarks for each visible hand. The app uses the FaceDetector Tasks-compatible BlazeFace model, then calculates the two-dimensional distance from each hand wrist to each face center. The minimum distance wins. The previous handedness receives a small preference so the lock does not rapidly jump between hands. If face detection fails, the error is isolated and gesture control continues with the highest-confidence hand rather than crashing. If the locked hand disappears for about 700 milliseconds, the lock is released.
 
 ### Gesture recognition
 

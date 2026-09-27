@@ -9,7 +9,7 @@ import { createSpeechRecognition, type VoiceCommand } from "@/lib/voice";
 
 type ControllerStatus = "off" | "loading" | "ready" | "searching" | "error";
 
-interface TasksRef { hands: HandLandmarker; faces: FaceDetector }
+interface TasksRef { hands: HandLandmarker; faces: FaceDetector | null }
 
 function friendlyCameraError(error: unknown) {
   if (error instanceof DOMException && error.name === "NotAllowedError") return "Camera permission was denied. Mouse controls are still available.";
@@ -50,7 +50,7 @@ export default function GlobalInteractionController() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     tasksRef.current?.hands.close();
-    tasksRef.current?.faces.close();
+    tasksRef.current?.faces?.close();
     tasksRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     lockedHandRef.current = null;
@@ -96,13 +96,23 @@ export default function GlobalInteractionController() {
       lastVideoTimeRef.current = video.currentTime;
       lastInferenceRef.current = timestamp;
       const handResult = tasksRef.current.hands.detectForVideo(video, timestamp);
-      const faceResult = tasksRef.current.faces.detectForVideo(video, timestamp);
+      let faceDetections: ReturnType<FaceDetector["detectForVideo"]>["detections"] = [];
+      if (tasksRef.current.faces) {
+        try {
+          faceDetections = tasksRef.current.faces.detectForVideo(video, timestamp).detections;
+        } catch {
+          // Isolate a face graph failure so hand control never crashes the app.
+          tasksRef.current.faces.close();
+          tasksRef.current.faces = null;
+          setStatusMessage("Hand tracking active · face matching unavailable");
+        }
+      }
       const hands: HandCandidate[] = handResult.landmarks.map((landmarks, index) => ({
         landmarks,
         score: handResult.handednesses[index]?.[0]?.score ?? 0,
         handedness: handResult.handednesses[index]?.[0]?.categoryName ?? `Hand ${index + 1}`,
       }));
-      const faces: FaceCenter[] = faceResult.detections.flatMap((detection) => {
+      const faces: FaceCenter[] = faceDetections.flatMap((detection) => {
         const box = detection.boundingBox;
         if (!box || !video.videoWidth || !video.videoHeight) return [];
         return [{ x: (box.originX + box.width / 2) / video.videoWidth, y: (box.originY + box.height / 2) / video.videoHeight }];
@@ -115,7 +125,7 @@ export default function GlobalInteractionController() {
         setLockedHand(candidate.handedness);
         setConfidence(candidate.score);
         setStatus("ready");
-        setStatusMessage(faces.length ? "Teacher hand locked to nearest face" : "Hand locked · face not visible");
+        setStatusMessage(faces.length ? "Teacher hand locked to nearest face" : tasksRef.current.faces ? "Hand locked · face not visible" : "Hand tracking active · face matching unavailable");
         processEvents(machineRef.current.process(interpretHand(candidate.landmarks), timestamp));
       } else {
         if (!lockLostAtRef.current) lockLostAtRef.current = timestamp;

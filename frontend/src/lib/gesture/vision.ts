@@ -2,11 +2,13 @@ import { FaceDetector, FilesetResolver, HandLandmarker } from "@mediapipe/tasks-
 
 const WASM_ROOT = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/wasm";
 const HAND_MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
-const FACE_MODEL = "https://storage.googleapis.com/mediapipe-assets/face_detection_full_range_sparse.tflite?generation=1674261618323821";
+// FaceDetector Tasks expects the 896-box BlazeFace short-range output. The legacy
+// full-range graph emits 2304 boxes and crashes the Tasks calculator at runtime.
+const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite";
 
 export interface VisionTasks {
   hands: HandLandmarker;
-  faces: FaceDetector;
+  faces: FaceDetector | null;
 }
 
 async function buildTasks(delegate: "GPU" | "CPU"): Promise<VisionTasks> {
@@ -19,11 +21,17 @@ async function buildTasks(delegate: "GPU" | "CPU"): Promise<VisionTasks> {
     minHandPresenceConfidence: 0.55,
     minTrackingConfidence: 0.55,
   });
-  const faces = await FaceDetector.createFromOptions(fileset, {
-    baseOptions: { modelAssetPath: FACE_MODEL, delegate },
-    runningMode: "VIDEO",
-    minDetectionConfidence: 0.5,
-  });
+  let faces: FaceDetector | null = null;
+  try {
+    faces = await FaceDetector.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: FACE_MODEL, delegate },
+      runningMode: "VIDEO",
+      minDetectionConfidence: 0.5,
+    });
+  } catch {
+    // Hand tracking remains useful when face-model setup fails.
+    faces = null;
+  }
   return { hands, faces };
 }
 
