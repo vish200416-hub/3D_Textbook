@@ -31,6 +31,8 @@ export interface LearningSceneController {
   setLayerVisible: (layer: "labels" | "connections" | "blocks", visible: boolean) => void;
   gestureZoom: (delta: number) => void;
   gestureRotate: (delta: number) => void;
+  selectAtClientPoint: (clientX: number, clientY: number) => void;
+  selectObjectByName: (name: string) => boolean;
   resetAnimation: () => void;
   resetCamera: () => void;
   dispose: () => void;

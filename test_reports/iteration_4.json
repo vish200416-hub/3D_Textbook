@@ -1,0 +1,61 @@
+{
+  "passed": 5,
+  "failed": 1,
+  "bugs": [
+    {
+      "severity": "high",
+      "criterion": "Voice selects named 3D components for explanation",
+      "description": "parseVoiceCommand (lib/voice.ts) requires a literal space inside multi-word component names (e.g. 'data node', 'name node'). The transcript 'select DataNode' (exactly the phrase shown in the app's own voice-command guide/hint text and in the acceptance criterion) lowercases to 'select datanode' with no space, so none of the select-* branches match and parseVoiceCommand returns null. The result is 'No matching command: \u201cselect DataNode\u201d' and the Selected Object panel never updates. 'explain NameNode' works only because of an unrelated fallback rule (line 47: value.includes('explain') && value.includes('name')) that happens to also match 'namenode'; there is no equivalent fallback for 'select DataNode' (or 'select NameNode'/'select Block'/'select Document'/'select Client', which have the same space-dependent bug).",
+      "evidence": "Browser check voice-selects-named-components-hdfs: after mocked SpeechRecognition delivers transcript 'select DataNode' on /lab?mode=hdfs, voice-status-message shows exactly 'No matching command: \u201cselect DataNode\u201d' (screenshot voice-selects-named-components-hdfs-select-datanode-attempt.png) and selected-object-name never appears (timeout). Reproduced deterministically twice (not flaky). Node repro: parseVoiceCommand('select DataNode') === null while parseVoiceCommand('explain NameNode') === 'explain-namenode'."
+    }
+  ],
+  "action_items": [
+    "Fix parseVoiceCommand in frontend/src/lib/voice.ts to match component names without requiring an internal space (e.g. normalize by stripping spaces on both the transcript and the keyword, or check value.includes('datanode') as well as 'data node') so 'select DataNode' (and the equally-affected 'select NameNode'/'select Block'/'select Document'/'select Client') resolve to their select-* command instead of null.",
+    "No API-bearing acceptance criteria this iteration; all six matrix items are entirely client-side (deterministic phrase matching, mocked MediaPipe hand tracking, mocked SpeechRecognition), consistent with seed_facts (no AI/API call, no auth). Backend test suite has zero test files and ran cleanly (0 collected, 0 failed)."
+  ],
+  "retest_needed": true,
+  "checks": [
+    {
+      "criterion": "Gesture double-tap on the Three.js canvas no longer triggers OrbitControls pointer capture",
+      "name": "gesture-double-tap-canvas-safe",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "With HTMLCanvasElement.prototype.setPointerCapture forced to throw DOMException NotFoundError and window pointerdown listened globally, a mocked MediaPipe HandLandmarker drove a deterministic point->tap->point->tap sequence over the /lab canvas. detected-gesture-name reached 'double-tap', zero pointerdown events were recorded, no pageerror fired, and a follow-up lesson-select-at CustomEvent grid search populated selected-object-name, proving the canvas-selection path works without synthetic pointer capture."
+    },
+    {
+      "criterion": "Gesture double-tap still activates normal UI controls",
+      "name": "gesture-double-tap-activates-ui-control",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Same mocked hand-tracking pipeline aimed at the nav-settings-link sidebar link: detected-gesture-name reached 'double-tap', the app navigated to /settings (ordinary .click() semantics), zero synthetic pointerdown events were recorded, and no pageerror occurred."
+    },
+    {
+      "criterion": "Voice commands route globally from learning pages",
+      "name": "voice-open-mongodb-animation-global",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "From /subject/big-data-analytics/module/module-2 (a module Learn page, not /lab), a mocked SpeechRecognition delivered 'open mongodb animation'; app navigated to /lab?mode=mongodb&play=1, lab-current-mode-title showed 'MongoDB Document Model' and lab-animation-toggle-button showed 'Pause flow' (animation playing)."
+    },
+    {
+      "criterion": "Voice controls the active 3D scene",
+      "name": "voice-controls-active-scene",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /lab, sequential mocked transcripts 'zoom in', 'zoom out', 'pause animation' (lab-animation-toggle-button -> 'Play flow'), 'start animation' (-> 'Pause flow'), and 'reset model' each produced a matching 'Heard: \u201c...\u201d' voice-status-message with no uncaught page errors."
+    },
+    {
+      "criterion": "Voice selects named 3D components for explanation",
+      "name": "voice-selects-named-components-hdfs",
+      "lane": "browser",
+      "status": "failed",
+      "evidence": "On /lab?mode=hdfs, transcript 'select DataNode' produced voice-status-message 'No matching command: \u201cselect DataNode\u201d' and selected-object-name never appeared (parseVoiceCommand returns null - see bugs[]). 'explain NameNode' worked correctly (selected-object-name became 'NameNode' via the Lab.tsx voice-command listener) with zero /api network calls observed throughout, confirming no AI call is used."
+    },
+    {
+      "criterion": "Unknown or unsupported voice remains safe",
+      "name": "voice-unknown-command-safe-fallback",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "With window.SpeechRecognition/webkitSpeechRecognition deleted, voice toggle showed 'Voice recognition is unsupported in this browser.' and mouse navigation (nav-settings-link -> /settings) still worked. With a mocked recognizer, transcript 'banana pancake party' produced voice-status-message 'No matching command: \u201cbanana pancake party\u201d' with mouse navigation still functional afterward; no uncaught page errors in either case."
+    }
+  ]
+}

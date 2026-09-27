@@ -87,12 +87,6 @@ export default function AppShell({ children }: AppShellProps) {
           </Link>
         </nav>
 
-        <div className="sidebar-bottom" data-testid="sidebar-bottom-card">
-          <div className="mini-orbit" aria-hidden="true"><div /><div /><div /></div>
-          <p className="eyebrow" data-testid="sidebar-phase-label">PHASE 03 / CLASSROOM READY</p>
-          <p className="sidebar-card-title" data-testid="sidebar-card-title">Teach beyond the page.</p>
-          <p className="sidebar-card-copy" data-testid="sidebar-card-copy">3D models, quizzes, gesture control and voice now share one learning flow.</p>
-        </div>
       </aside>
 
       {menuOpen && <button className="sidebar-scrim" onClick={closeMenu} aria-label="Close navigation" data-testid="sidebar-scrim-button" />}

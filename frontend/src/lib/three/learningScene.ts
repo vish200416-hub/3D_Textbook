@@ -250,12 +250,17 @@ export function createLearningScene(
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const getHit = (event: PointerEvent) => {
+  const getHitAtClientPoint = (clientX: number, clientY: number) => {
     const bounds = renderer.domElement.getBoundingClientRect();
-    pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
-    pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+    pointer.x = ((clientX - bounds.left) / bounds.width) * 2 - 1;
+    pointer.y = -((clientY - bounds.top) / bounds.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
     return raycaster.intersectObjects(selectable, false)[0]?.object ?? null;
+  };
+
+  const selectObject = (object: THREE.Object3D | null) => {
+    setHighlight(object);
+    onSelect(object ? infoByObject.get(object) ?? null : null);
   };
 
   const setHighlight = (object: THREE.Object3D | null) => {
@@ -274,11 +279,9 @@ export function createLearningScene(
     restore(highlighted, true);
   };
 
-  const onPointerMove = (event: PointerEvent) => setHighlight(getHit(event));
+  const onPointerMove = (event: PointerEvent) => setHighlight(getHitAtClientPoint(event.clientX, event.clientY));
   const onPointerDown = (event: PointerEvent) => {
-    const hit = getHit(event);
-    if (hit) onSelect(infoByObject.get(hit) ?? null);
-    else onSelect(null);
+    selectObject(getHitAtClientPoint(event.clientX, event.clientY));
   };
   renderer.domElement.addEventListener("pointermove", onPointerMove);
   renderer.domElement.addEventListener("pointerdown", onPointerDown);
@@ -339,6 +342,22 @@ export function createLearningScene(
       offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), delta * 2.2);
       camera.position.copy(controls.target).add(offset);
       controls.update();
+    },
+    selectAtClientPoint: (clientX, clientY) => {
+      selectObject(getHitAtClientPoint(clientX, clientY));
+    },
+    selectObjectByName: (name) => {
+      const normalized = name.trim().toLowerCase().replaceAll(" ", "");
+      const match = selectable.find((object) => {
+        const info = infoByObject.get(object);
+        if (!info) return false;
+        const id = info.id.toLowerCase().replaceAll("-", "");
+        const title = info.name.toLowerCase().replaceAll(" ", "");
+        return id.includes(normalized) || title.includes(normalized);
+      });
+      if (!match) return false;
+      selectObject(match);
+      return true;
     },
     resetAnimation: () => {
       animationTime = 0;

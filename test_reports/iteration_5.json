@@ -1,0 +1,53 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "No API-bearing acceptance criteria this iteration; all six matrix items are entirely client-side (deterministic phrase matching, mocked MediaPipe hand tracking, mocked SpeechRecognition). Backend tests/ contains only conftest.py (0 collected) - no backend lane applicable."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Gesture double-tap on the Three.js canvas no longer triggers OrbitControls pointer capture",
+      "name": "gesture-double-tap-canvas-safe",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: with HTMLCanvasElement.prototype.setPointerCapture forced to throw NotFoundError, mocked MediaPipe hand tracking drove point->tap->point->tap over the /lab canvas. detected-gesture-name reached 'double-tap', zero synthetic pointerdown events recorded, no pageerror, and lesson-select-at raycasting populated selected-object-name."
+    },
+    {
+      "criterion": "Gesture double-tap still activates normal UI controls",
+      "name": "gesture-double-tap-activates-ui-control",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: double-tap over nav-settings-link navigated to /settings via ordinary click semantics; zero synthetic pointerdown events; no pageerror."
+    },
+    {
+      "criterion": "Voice commands route globally from learning pages",
+      "name": "voice-open-mongodb-animation-global",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: from module Learn page, mocked transcript 'open mongodb animation' navigated to /lab?mode=mongodb&play=1; lab-current-mode-title showed 'MongoDB Document Model' with animation playing (lab-animation-toggle-button = 'Pause flow')."
+    },
+    {
+      "criterion": "Voice controls the active 3D scene",
+      "name": "voice-controls-active-scene",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: sequential transcripts 'zoom in', 'zoom out', 'pause animation', 'start animation', 'reset model' each produced a matching 'Heard' status with no uncaught page errors."
+    },
+    {
+      "criterion": "Voice selects named 3D components for explanation",
+      "name": "voice-selects-named-components-hdfs",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "PREVIOUSLY FAILING, NOW FIXED. On /lab?mode=hdfs, transcript 'select DataNode' (no internal space) now produces voice-status-message 'Heard: \u201cselect DataNode\u201d' and selected-object-name updates to match /DataNode/i (parser fix confirmed: compactValue/mentions() now matches joined component names). 'explain NameNode' also selects correctly and selected-object-properties is visible. Zero /api network calls observed, confirming no AI call is used. Updated the check's assertion from the old bug-documenting expectation ('No matching command') to the corrected expected behavior, then verified pass."
+    },
+    {
+      "criterion": "Unknown or unsupported voice remains safe",
+      "name": "voice-unknown-command-safe-fallback",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: with SpeechRecognition APIs deleted, unsupported fallback message shown and mouse navigation still worked. With mocked recognizer, transcript 'banana pancake party' produced 'No matching command' status with mouse navigation still functional afterward; no uncaught page errors."
+    }
+  ]
+}

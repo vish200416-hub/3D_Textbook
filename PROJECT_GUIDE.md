@@ -67,6 +67,7 @@ Open `http://localhost:3000`. Camera access needs HTTPS or localhost. The first 
 - Whole-site MediaPipe hand control with nearest-face hand association and visible confidence.
 - Virtual pointer, deliberate double-tap click, pinch-distance zoom, two-finger rotation and palm-slide navigation/scroll.
 - Whole-site optional Web Speech commands with unsupported-browser fallback.
+- Deterministic whole-site voice routing opens named simulations, controls zoom/playback and selects named 3D components without an AI service.
 - One explained multiple-choice quiz per VTU module, scores and revision topics.
 - Browser-persistent topic, model, object, quiz, gesture and voice progress.
 - Progress dashboard with overall signal, module performance and reset confirmation.

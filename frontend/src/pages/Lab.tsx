@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Box, Calculator, CheckCircle2, CircleHelp, Eye, EyeOff, Gauge, Info, Layers3, Pause, Play, RotateCcw, SlidersHorizontal, Sparkles, Target, Zap } from "lucide-react";
 import ThreeLearningLab from "@/components/ThreeLearningLab";
 import { getLabMetrics, DEFAULT_LAB_CONFIG, type LabConfig, type LabMode, type SelectedObjectInfo } from "@/lib/three/types";
@@ -26,6 +26,7 @@ function ParameterControl({ label, value, min, max, step = 1, suffix, onChange, 
 }
 
 export default function Lab() {
+  const [searchParams] = useSearchParams();
   const [config, setConfig] = useState<LabConfig>(DEFAULT_LAB_CONFIG);
   const [playing, setPlaying] = useState(true);
   const [resetSignal, setResetSignal] = useState(0);
@@ -35,6 +36,16 @@ export default function Lab() {
   const [showExplanation, setShowExplanation] = useState(false);
   const metrics = useMemo(() => getLabMetrics(config), [config]);
   const currentMode = modeOptions.find((option) => option.id === config.mode) ?? modeOptions[0];
+
+  useEffect(() => {
+    const requestedMode = searchParams.get("mode");
+    const validMode = modeOptions.find((option) => option.id === requestedMode)?.id;
+    if (validMode) {
+      setConfig((current) => ({ ...current, mode: validMode }));
+      trackProgress("mode", validMode);
+    }
+    if (searchParams.get("play") === "1") setPlaying(true);
+  }, [searchParams]);
 
   const updateConfig = (key: keyof LabConfig, value: number | LabMode) => setConfig((current) => ({ ...current, [key]: value }));
   const handleSelect = useCallback((info: SelectedObjectInfo | null) => {
