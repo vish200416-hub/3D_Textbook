@@ -27,6 +27,14 @@ The five modules cover the official extracted 2022-scheme topics: Big Data found
 
 No authentication or roles in Phase 1. Progress is currently representative static UI data; localStorage persistence is reserved for the progress/quiz phase.
 
+## Phase 2 additions
+
+- `/lab` is now a live Three.js learning lab with procedural fallback scenes for HDFS, Big Data 5Vs, MongoDB, Hive/Pig and Spark/web analytics.
+- The HDFS scene includes Client, NameNode, DataNodes, blocks, replicas, connection lines, raycast selection, hover highlighting, packet animation, camera reset and OrbitControls.
+- Dynamic sliders change DataNodes, blocks, replication, flow speed and dataset scale; the Numerical Lens recalculates simplified educational metrics.
+- A reusable `createLearningScene()` factory and `ThreeLearningLab` React wrapper dispose renderers, controls, geometries, materials, labels and event listeners safely.
+- `GLTFLoader` is imported and exposed through `loadLearningModel()` for future approved assets; the preview intentionally uses procedural geometry and no model download.
+
 ## Intentionally deferred
 
-Three.js scenes, GLTF loading, raycast selection, animations, MediaPipe gestures, virtual cursor, Web Speech commands, quizzes, persistent local progress and AI explanation are planned for later phases and appear as connected previews where appropriate.
+MediaPipe gestures, virtual cursor, Web Speech commands, quizzes, persistent local progress and AI explanation are planned for Phase 3. The Phase 2 `Explain this` control uses a predefined local response rather than an AI API.

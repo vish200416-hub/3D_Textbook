@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BookOpen, Calculator, CheckCircle2, ChevronRight, CirclePlay, Code2, Database, FileText, FlaskConical, Layers3, LockKeyhole, MousePointer2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Calculator, CheckCircle2, ChevronRight, Code2, Database, FileText, FlaskConical, Layers3, LockKeyhole, MousePointer2, Sparkles } from "lucide-react";
 import { getSyllabusModule, syllabusModules, type SyllabusModule, type TopicKind } from "@/data/syllabus";
 
 type LearningTab = "learn" | "explore" | "practice" | "code";
@@ -12,15 +12,6 @@ const tabConfig: Array<{ id: LearningTab; label: string; icon: typeof BookOpen }
   { id: "code", label: "Code lab", icon: Code2 },
 ];
 
-const kindLabel: Record<TopicKind, string> = { concept: "Concept", demo: "Demo", numerical: "Numerical", code: "Code" };
-
-function TopicIcon({ kind }: { kind: TopicKind }) {
-  if (kind === "demo") return <CirclePlay size={15} />;
-  if (kind === "numerical") return <Calculator size={15} />;
-  if (kind === "code") return <Code2 size={15} />;
-  return <FileText size={15} />;
-}
-
 function ModuleProgressRail({ module }: { module: SyllabusModule }) {
   return <aside className="module-rail glass-panel" data-testid="module-topic-rail"><div className="rail-top"><p className="eyebrow" data-testid="module-rail-label">MODULE MAP</p><span className="rail-count" data-testid="module-rail-count">{module.topics.length}</span></div><div className="topic-rail-list">{module.topics.map((topic, index) => <div className="topic-rail-item" key={topic.id} data-testid={`topic-rail-item-${topic.id}`}><span className="topic-rail-index">{String(index + 1).padStart(2, "0")}</span><span data-testid={`topic-rail-title-${topic.id}`}>{topic.title}</span></div>)}</div><div className="rail-footer" data-testid="module-rail-footer"><CheckCircle2 size={15} /><span>{module.progress}% explored</span></div></aside>;
 }
@@ -31,7 +22,7 @@ function LearnPanel({ module }: { module: SyllabusModule }) {
 }
 
 function ExplorePanel({ module }: { module: SyllabusModule }) {
-  return <div className="learning-panel" data-testid="explore-panel"><div className="panel-kicker"><span className="kicker-dot violet-dot" /> INTERACTIVE PREVIEW</div><h2 data-testid="explore-panel-title">Make the architecture visible.</h2><p className="panel-copy" data-testid="explore-panel-copy">Phase 1 gives every topic a visual home. The Three.js lab will turn this {module.title.toLowerCase()} map into a manipulable scene in Phase 3.</p><div className="architecture-preview" data-testid="architecture-preview"><div className="architecture-line line-a" /><div className="architecture-line line-b" /><div className="architecture-node node-a"><Database size={18} /><span>NameNode</span></div><div className="architecture-node node-b"><Layers3 size={18} /><span>DataNodes</span></div><div className="architecture-node node-c"><Sparkles size={18} /><span>Insights</span></div><div className="data-pulse pulse-a" /><div className="data-pulse pulse-b" /></div><div className="preview-footer" data-testid="explore-preview-footer"><span><MousePointer2 size={15} /> Click to inspect</span><span><Layers3 size={15} /> Orbit and zoom</span><span><LockKeyhole size={15} /> Phase 3</span></div></div>;
+  return <div className="learning-panel" data-testid="explore-panel"><div className="panel-kicker"><span className="kicker-dot violet-dot" /> INTERACTIVE 3D PREVIEW</div><h2 data-testid="explore-panel-title">Make the architecture visible.</h2><p className="panel-copy" data-testid="explore-panel-copy">Phase 2 turns this {module.title.toLowerCase()} map into a manipulable scene. Start with HDFS, then switch visual modes to compare the other syllabus systems.</p><div className="architecture-preview" data-testid="architecture-preview"><div className="architecture-line line-a" /><div className="architecture-line line-b" /><div className="architecture-node node-a"><Database size={18} /><span>NameNode</span></div><div className="architecture-node node-b"><Layers3 size={18} /><span>DataNodes</span></div><div className="architecture-node node-c"><Sparkles size={18} /><span>Insights</span></div><div className="data-pulse pulse-a" /><div className="data-pulse pulse-b" /></div><div className="preview-footer" data-testid="explore-preview-footer"><span><MousePointer2 size={15} /> Click to inspect</span><span><Layers3 size={15} /> Orbit and zoom</span><span><LockKeyhole size={15} /> Phase 2</span><Link to="/lab" className="preview-lab-link" data-testid="open-3d-lab-button">Open full 3D lab <ArrowRight size={14} /></Link></div></div>;
 }
 
 function PracticePanel({ module }: { module: SyllabusModule }) {

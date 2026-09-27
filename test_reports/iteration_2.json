@@ -1,0 +1,19 @@
+{
+  "passed": 8,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "No API-bearing acceptance criteria this iteration; Phase 2 3D lab is entirely client-side (procedural Three.js, mocked local Explain response, no auth) so no backend test files were added."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {"criterion":"Textbook Explore flow opens the live 3D lab","name":"textbook-explore-opens-lab","lane":"browser","status":"passed","evidence":"Module 02 Explore tab showed Open full 3D lab button; click navigated to /lab and rendered a canvas inside three-canvas-host."},
+    {"criterion":"HDFS model visualizes the required architecture","name":"hdfs-default-scene-architecture","lane":"browser","status":"passed","evidence":"Default /lab loaded HDFS mode active, title HDFS Architecture, overlay confirmed 4 DataNodes · 6 blocks · 2× replication, canvas rendered with visible size (no external model download)."},
+    {"criterion":"Three.js camera controls work","name":"camera-orbit-zoom-reset","lane":"browser","status":"passed","evidence":"Canvas pixel diff confirmed change after mouse drag (orbit) and wheel scroll (zoom); Reset camera button clicked successfully afterward."},
+    {"criterion":"Raycaster object selection explains components","name":"raycaster-object-selection","lane":"browser","status":"passed","evidence":"Clicking canvas populated selected-object-name/type/description/properties; Explain this button revealed explain-this-response with mocked local text."},
+    {"criterion":"Educational data-flow animation is controllable","name":"animation-pause-play-reset","lane":"browser","status":"passed","evidence":"Toggle button switched between 'Pause flow' and 'Play flow' labels; Reset animation button returned flow to paused/initial state."},
+    {"criterion":"Dynamic HDFS parameters update model and numericals","name":"dynamic-hdfs-parameters-update-metrics","lane":"browser","status":"passed","evidence":"DataNodes/blocks/replication sliders updated canvas overlay text (6 DataNodes, 10 blocks, 3× replication) and metrics-list content changed accordingly."},
+    {"criterion":"Topic visual modes cover all five syllabus modules","name":"topic-visual-modes-switch-scenes","lane":"browser","status":"passed","evidence":"Cycled foundations, mongodb, hive-pig, spark-web, hdfs; each activated its mode button, updated lab-current-mode-title, and produced a distinct canvas pixel screenshot."},
+    {"criterion":"Scene visibility and responsive behavior work","name":"scene-visibility-and-responsive","lane":"browser","status":"passed","evidence":"Labels/connections/blocks toggle buttons switched ON/OFF states; resized to 834x1112 tablet viewport kept canvas (>50px) and inspector visible with zero failed network requests."}
+  ]
+}
