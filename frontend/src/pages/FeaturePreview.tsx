@@ -1,0 +1,16 @@
+import { ArrowLeft, ArrowUpRight, Box, CheckCircle2, Hand, Mic, Settings, Trophy } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+
+const featureCopy = {
+  lab: { eyebrow: "PHASE 03 / 3D LEARNING LAB", title: "The syllabus, with depth.", description: "Three.js scenes, orbit controls, raycast selection and visual explanations will turn each topic into a place you can explore.", icon: Box, accent: "cyan", next: "Open a module first" },
+  gesture: { eyebrow: "PHASE 06 / GESTURE MODE", title: "Point. Pinch. Understand.", description: "MediaPipe hand tracking will let you move a virtual cursor, highlight a model component and open its explanation without touching the mouse.", icon: Hand, accent: "violet", next: "See the planned flow" },
+  progress: { eyebrow: "PHASE 09 / LEARNING PROGRESS", title: "Small steps, visible momentum.", description: "Your chapter completion, quiz scores, explored models and practice queue will come together in one local-first progress view.", icon: Trophy, accent: "amber", next: "Return to syllabus" },
+  settings: { eyebrow: "WORKSPACE SETTINGS", title: "Tune your learning surface.", description: "Theme, motion and future input preferences will live here. Phase 1 keeps the controls intentionally lightweight.", icon: Settings, accent: "green", next: "Return home" },
+};
+
+export default function FeaturePreview() {
+  const { feature = "lab" } = useParams();
+  const content = featureCopy[feature as keyof typeof featureCopy] ?? featureCopy.lab;
+  const Icon = content.icon;
+  return <div className="feature-preview-page" data-testid={`feature-preview-${feature}`}><Link to="/" className="back-link" data-testid="feature-preview-back-link"><ArrowLeft size={15} /> Back to dashboard</Link><div className={`feature-preview-card glass-panel accent-${content.accent}`} data-testid="feature-preview-card"><div className="feature-preview-icon"><Icon size={28} /></div><p className="eyebrow" data-testid="feature-preview-eyebrow">{content.eyebrow}</p><h1 data-testid="feature-preview-title">{content.title}</h1><p data-testid="feature-preview-description">{content.description}</p><div className="preview-checklist" data-testid="feature-preview-checklist"><span data-testid="preview-check-1"><CheckCircle2 size={15} /> Local-first foundation ready</span><span data-testid="preview-check-2"><CheckCircle2 size={15} /> Connected to VTU modules</span><span data-testid="preview-check-3"><CheckCircle2 size={15} /> Built as the next learning layer</span></div><Link to={feature === "progress" ? "/subject/big-data-analytics" : feature === "settings" ? "/" : "/subject/big-data-analytics/module/module-2"} className="primary-button" data-testid="feature-preview-next-button">{content.next}<ArrowUpRight size={16} /></Link></div><div className="feature-preview-side" data-testid="feature-preview-side-card"><div className="side-icon"><Mic size={20} /></div><p className="eyebrow" data-testid="preview-side-eyebrow">DESIGNED FOR THE DEMO</p><h3 data-testid="preview-side-title">Textbook → concept → interaction.</h3><p data-testid="preview-side-copy">Every future feature has a clear place in the same flow, so the final project feels like one product instead of disconnected experiments.</p></div></div>;
+}

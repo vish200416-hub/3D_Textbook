@@ -1,0 +1,117 @@
+{
+  "project_info": {
+    "name": "3D Interactive Textbook - Big Data Analytics (VTU Syllabus)",
+    "phase": "Phase 1 - UI, Navigation, Subject & Chapter Cards, Future-Ready Entry Points",
+    "target_audience": "Computer Science & Engineering Students (VTU Syllabus BAD601/BCS714D)",
+    "aesthetic": "Futuristic Glassmorphic Dark/Light Educational Studio with 3D-Inspired Visual Elements"
+  },
+  "typography": {
+    "font_family_heading": "'Cabinet Grotesk', 'Outfit', 'Space Grotesk', sans-serif",
+    "font_family_body": "'Inter', 'Geist Variable', system-ui, sans-serif",
+    "font_family_code": "'JetBrains Mono', 'Fira Code', monospace",
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-semibold tracking-tight",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed text-slate-300 dark:text-slate-300 text-slate-700",
+      "small": "text-sm font-medium tracking-wide uppercase"
+    }
+  },
+  "colors": {
+    "theme_mode": "Support both Dark (default primary mode for futuristic 3D feel) and Light mode",
+    "dark": {
+      "background": "#0B0F19",
+      "surface": "#111827",
+      "surface_glass": "rgba(17, 24, 39, 0.75)",
+      "border": "rgba(255, 255, 255, 0.12)",
+      "border_glow": "rgba(56, 189, 248, 0.3)",
+      "text_primary": "#F8FAFC",
+      "text_secondary": "#94A3B8",
+      "accent_cyan": "#06B6D4",
+      "accent_violet": "#8B5CF6",
+      "accent_amber": "#F59E0B",
+      "accent_emerald": "#10B981"
+    },
+    "light": {
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "surface_glass": "rgba(255, 255, 255, 0.85)",
+      "border": "rgba(15, 23, 42, 0.12)",
+      "border_glow": "rgba(14, 165, 233, 0.3)",
+      "text_primary": "#0F172A",
+      "text_secondary": "#475569",
+      "accent_cyan": "#0284C7",
+      "accent_violet": "#7C3AED",
+      "accent_amber": "#D97706",
+      "accent_emerald": "#059669"
+    }
+  },
+  "layout_and_spacing": {
+    "container_padding": "px-4 sm:px-6 lg:px-8 py-8",
+    "grid_bento": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6 lg:gap-8",
+    "card_padding": "p-6 sm:p-8",
+    "navigation_header": "sticky top-0 z-50 backdrop-blur-xl bg-slate-900/80 dark:bg-slate-900/80 bg-white/80 border-b border-slate-800 dark:border-slate-800 border-slate-200"
+  },
+  "vtu_big_data_modules": [
+    {
+      "id": "module-1",
+      "code": "MODULE 01",
+      "title": "Introduction to Big Data & Analytics Frameworks",
+      "topics_count": 5,
+      "numericals_count": 2,
+      "code_snippets_count": 3,
+      "key_topics": ["5Vs of Big Data", "Data Warehousing vs Hadoop", "Distributed File Storage Concepts", "Structured vs Unstructured Data Analysis"]
+    },
+    {
+      "id": "module-2",
+      "code": "MODULE 02",
+      "title": "Hadoop Architecture & MapReduce Paradigm",
+      "topics_count": 6,
+      "numericals_count": 3,
+      "code_snippets_count": 5,
+      "key_topics": ["HDFS NameNode & DataNode Architecture", "YARN Resource Manager", "Mapper & Reducer Anatomy", "Shuffle, Sort & Combiner Optimization", "Matrix Multiplication in MapReduce"]
+    },
+    {
+      "id": "module-3",
+      "code": "MODULE 03",
+      "title": "NoSQL Databases & MongoDB Deep Dive",
+      "topics_count": 5,
+      "numericals_count": 2,
+      "code_snippets_count": 4,
+      "key_topics": ["CAP Theorem & BASE Consistency", "MongoDB Document Model", "Aggregation Pipeline Engine", "Indexing & Sharding Clusters"]
+    },
+    {
+      "id": "module-4",
+      "code": "MODULE 04",
+      "title": "High-Level Analytics with Hive & Pig",
+      "topics_count": 4,
+      "numericals_count": 2,
+      "code_snippets_count": 3,
+      "key_topics": ["Hive Architecture & HQL Queries", "Hive User-Defined Functions (UDF)", "Pig Latin Dataflow Scripts", "Pig vs Hive Comparison"]
+    },
+    {
+      "id": "module-5",
+      "code": "MODULE 05",
+      "title": "Apache Spark & Web / Text Mining Algorithms",
+      "topics_count": 4,
+      "numericals_count": 3,
+      "code_snippets_count": 3,
+      "key_topics": ["Spark Resilient Distributed Datasets (RDD)", "Spark DataFrames & SQL Engine", "PageRank Algorithm Computation", "TF-IDF Text Mining"]
+    }
+  ],
+  "image_urls": {
+    "hero_3d_background": "https://images.unsplash.com/photo-1660165458059-57cfb6cc87e5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxmdXR1cmlzdGljJTIwM2QlMjBkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGFic3RyYWN0JTIwdGVjaCUyMGFuYWx5dGljcyUyMG5ldHdvcmslMjBjeWJlciUyMGdyaWR8ZW58MHx8fHwxNzkwNTA1OTA3fDA&ixlib=rb-4.1.0&q=85",
+    "hadoop_hdfs_preview": "https://images.unsplash.com/photo-1639322537228-f710d846310a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHw0fHxmdXR1cmlzdGljJTIwM2QlMjBkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGFic3RyYWN0JTIwdGVjaCUyMGFuYWx5dGljcyUyMG5ldHdvcmslMjBjeWJlciUyMGdyaWR8ZW58MHx8fHwxNzkwNTA1OTA3fDA&ixlib=rb-4.1.0&q=85",
+    "network_grid_preview": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHDFHxmdXR1cmlzdGljJTIwM2QlMjBkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGFic3RyYWN0JTIwdGVjaCUyMGFuYWx5dGljcyUyMG5ldHdvcmslMjBjeWJlciUyMGdyaWR8ZW58MHx8fHwxNzkwNTA1OTA3fDA&ixlib=rb-4.1.0&q=85"
+  },
+  "instructions_to_main_agent": [
+    "Build Phase 1 of the 3D Interactive Textbook web application in React + TypeScript.",
+    "Ensure client-side navigation allows smooth switching between Home Dashboard, Subject Overview, Module Cards, Chapter/Topic Detail Views, VTU Numericals Explorer, Code Snippet Library, and 3D Interactive Mode Preview.",
+    "Implement high quality glassmorphism UI with subtle gradient borders, glowing badge tags, responsive sidebar/tabs, search/filter mechanism, dark/light theme toggle, and progress completion indicators.",
+    "Include placeholder action cards for Phase 2/3 integrations (3D Mesh Controls, Hand Gesture Navigation, Audio Voice Search) with clear futuristic indicators.",
+    "Ensure every interactive button, input, tab, card, and navigation link includes a clear kebab-case data-testid attribute (e.g. data-testid='module-card-hadoop', data-testid='theme-toggle-button').",
+    "DO NOT use transparent header without a blur or background color. Use backdrop-blur-xl with border."
+  ]
+},
+overwrite:true,path:
